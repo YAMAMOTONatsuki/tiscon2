@@ -29,4 +29,9 @@ public class LoginUserPrincipal implements UserPrincipal {
     public String getName() {
         return "user";
     }
+
+    public Long getUserId() {
+        return userId;
+    }
+
 }

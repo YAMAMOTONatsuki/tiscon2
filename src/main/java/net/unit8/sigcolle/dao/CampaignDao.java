@@ -14,12 +14,14 @@ import org.seasar.doma.Select;
  */
 @Dao(config = DomaConfig.class)
 public interface CampaignDao {
+    @Insert
+    int insert(Campaign campaign);
+
     @Select(ensureResult = true)
     UserCampaign selectById(Long campaignId);
 
     @Select
     List<Campaign> selectAll();
 
-    @Insert
-    int insert(Campaign campaign);
+
 }

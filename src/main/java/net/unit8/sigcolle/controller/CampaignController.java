@@ -6,11 +6,15 @@ import javax.transaction.Transactional;
 import enkan.component.doma2.DomaProvider;
 import enkan.data.Flash;
 import enkan.data.HttpResponse;
+import enkan.data.Session;
 import kotowari.component.TemplateEngine;
+import net.unit8.sigcolle.auth.LoginUserPrincipal;
 import net.unit8.sigcolle.dao.CampaignDao;
 import net.unit8.sigcolle.dao.SignatureDao;
 import net.unit8.sigcolle.form.CampaignForm;
 import net.unit8.sigcolle.form.SignatureForm;
+import net.unit8.sigcolle.model.Campaign;
+import net.unit8.sigcolle.model.User;
 import net.unit8.sigcolle.model.UserCampaign;
 import net.unit8.sigcolle.model.Signature;
 
@@ -22,6 +26,7 @@ import static enkan.util.ThreadingUtils.some;
 /**
  * @author kawasima
  */
+
 public class CampaignController {
     @Inject
     private TemplateEngine templateEngine;
@@ -97,8 +102,23 @@ public class CampaignController {
      * 新規キャンペーン作成処理.
      * @return HttpResponse
      */
-    public HttpResponse create() {
+    public HttpResponse create(CampaignForm form,Session session) {
         // TODO: create campaign
+        CampaignDao campaignDao = domaProvider.getDao(CampaignDao.class);
+
+        LoginUserPrincipal a = (LoginUserPrincipal)session.get("principal");
+
+        Campaign campaign = builder(new Campaign())
+                //.set(Campaign::setCampaignId, a.getUserId())
+                .set(Campaign::setTitle, form.getTitle())
+                .set(Campaign::setStatement, form.getStatement())
+                .set(Campaign::setGoal, form.getGoal())
+                .set(Campaign::setCreateUserId, a.getUserId())
+                .build();
+        campaignDao.insert(campaign);
+
+        SignatureDao signatureDao = domaProvider.getDao(SignatureDao.class);
+
         return builder(redirect("/", SEE_OTHER)).build();
     }
 }
